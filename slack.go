@@ -28,14 +28,14 @@ func startSlackRTM(token string) (string, string, error) {
 
 	if err != nil {
 		fmt.Println("Error: Slack url is wrong")
-		return err
+		return "", "", err
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
 		fmt.Println("Error: could not read Slack response")
-		return err
+		return "", "", err
 	}
 
 	var connectionResponse slackResponse
@@ -43,7 +43,7 @@ func startSlackRTM(token string) (string, string, error) {
 
 	if !connectionResponse.Ok {
 		err = fmt.Errorf("Slack response was not ok:, %s", connectionResponse.Error)
-		return err
+		return "", "", err
 	}
 
 	successMsg := fmt.Sprintf("Success: slack returned a websocket [%s] and a userID [%s]", connectionResponse.Url, connectionResponse.Userdata.Id)
