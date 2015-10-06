@@ -14,13 +14,13 @@ box: wercker/golang
 
 # build pipeline
 build:
-	steps:
-		- wercker/golint
-		- script:
-				name: go build
-				code: |
-					go build ./
-		- script:
-				name: go test
-				code: |
-					go test ./
+    steps:
+        - wercker/golint
+        - script:
+            name: go build
+            code: |
+                go build ./
+        - script:
+            name: go test
+            code: |
+                go test ./
