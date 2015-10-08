@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"golang.org/x/net/websocket"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"sync/atomic"
 )
 
 type slackResponse struct {
@@ -19,32 +21,32 @@ type userID struct {
 	Id string `json:"id"`
 }
 
-type message struct {
-	Id      int    `json:id`
-	Type    string `json:type`
-	Channel string `json:channel`
-	Text    string `json:text`
+type Message struct {
+	Id      uint64 `json:"id"`
+	Type    string `json:"type"`
+	Channel string `json:"channel"`
+	Text    string `json:"text"`
 }
+
+var counter uint64
 
 // ConnectToSlack starts Slack real time messaging and opens a websocket
 // Returns a websocket, a userID, an error
-func connectToSlack(token string) (string, string, error) {
+func connectToSlack(token string) (*websocket.Conn, string, error) {
 	url := "https://slack.com/api/rtm.start?token=" + token
 
 	// connect to rtm
 	res, err := http.Get(url)
 
 	if err != nil {
-		fmt.Println("Error: Slack url is wrong")
-		return "", "", err
+		log.Fatal(err)
 	}
 
 	// store get response
 	body, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		fmt.Println("Error: cannot read Slack response")
-		return "", "", err
+		log.Fatal(err)
 	}
 
 	// assign get response to slackResponse struct
@@ -52,8 +54,7 @@ func connectToSlack(token string) (string, string, error) {
 	json.Unmarshal(body, &connectionResponse)
 
 	if !connectionResponse.Ok {
-		err = fmt.Errorf("Slack response was not ok:, %s", connectionResponse.Error)
-		return "", "", err
+		log.Fatal(err)
 	}
 
 	// connect to slack
@@ -61,23 +62,31 @@ func connectToSlack(token string) (string, string, error) {
 
 	if err != nil {
 		err = fmt.Errorf("Error: cannot open slack websocket")
-		return "", "", err
+		return socket, "", err
 	}
 
-	return socket, connectionResponse.Userdata.Id
-
-	successMsg := fmt.Sprintf("Success: slack returned a websocket [%s] and a userID [%s]", connectionResponse.Url, connectionResponse.Userdata.Id)
-	return successMsg, connectionResponse.Userdata.Id, nil
+	return socket, connectionResponse.Userdata.Id, nil
 }
 
-// getMessage listens to Slack messages
-// returns ...
-func getMessage(webSocket string, msg string) string {
+// GetMessage listens to Slack messages
+// Returns the message or an error
+func getMessage(ws *websocket.Conn) (Message, error) {
 
+	// the message to return
+	var msg Message
+	err := websocket.JSON.Receive(ws, &msg)
+
+	if err != nil {
+		fmt.Errorf("Error: cannot get message")
+		return msg, err
+	}
+
+	return msg, err
 }
 
-// postMessage publishes a message on Slack
-// returns ...
-func postMessage(webSocket string) string {
-
+// PostMessage publishes a message on Slack
+// Returns an error if it couldn't complete the operation
+func postMessage(ws *websocket.Conn, msg Message) error {
+	msg.Id = atomic.AddUint64(&counter, 1)
+	return websocket.JSON.Send(ws, msg)
 }
