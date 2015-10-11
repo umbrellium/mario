@@ -17,13 +17,21 @@ box: wercker/golang
 build:
     steps:
         #- wercker/golint
+        - setup-go-workspace
+
+        # Gets dependencies
         - script:
             name: go get
             code: |
                 go get ./
+
+        # Build the projetc
+        - script:
             name: go build
             code: |
                 go build ./
+
+        # Run tests
         - script:
             name: go test
             code: |
