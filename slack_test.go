@@ -12,10 +12,12 @@ func TestSlackCoonnection(t *testing.T) {
 	}
 }
 
-func TestGetMessage() {
+func TestGetMessage(t *testing.T) {
 
 }
 
-func TestPostMessage() {
+func TestPostMessage(t *testing.T) {
 
 }
+
+// test mario commands option

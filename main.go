@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	"log"
 	"os"
 	"strings"
@@ -19,15 +19,11 @@ func main() {
 
 	// connect to slack
 	websocket, marioId, err := connectToSlack(token)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// start loop
 	for {
-
-		// get messages
 		message, err := getMessage(websocket)
 
 		if err != nil {
@@ -35,30 +31,32 @@ func main() {
 		}
 
 		// parse message and act accordingly
-		if message.Type == "message" {
-			// check if Mario was metioned
-			msg_slice := strings.Fields(message.Text)
-			if msg_slice[0] == "<@"+marioId+">" {
+		if message.Type == "message" && strings.HasPrefix(message.Text, "<@"+marioId+">") {
+			text := strings.TrimPrefix(message.Text, "<@"+marioId+"> ")
+			text = strings.TrimSpace(text)
 
-				//get command sent to mario
-				command := msg_slice[1]
+			messageHandled := false
 
-				switch command {
-				case "help":
-					go func(m Message) {
-						message.Text = "Hello!"
-						err := postMessage(websocket, message)
-
-						if err != nil {
-							log.Fatal(err)
-						}
-
-						fmt.Println("Posting message")
-					}(message)
-				default:
-					fmt.Println("nothing was passed")
+			for _, task := range tasks {
+				// we are using text to perform a reg ex and decide which method to call
+				if task.Hear(websocket, message, text) {
+					messageHandled = true
+					break
 				}
 			}
+
+			// Mario cannot understand command
+			if messageHandled == false {
+				message.Text = `I don't understand what you are asking me to do.
+Please ensure that your message doesn't contain any spelling mistake.
+You can type '@mario help' to see a list of the available tasks I can perform.`
+				err := postMessage(websocket, message)
+
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+
 		}
 
 	}
