@@ -21,6 +21,7 @@ type userID struct {
 	Id string `json:"id"`
 }
 
+// Message struct use to generate Slack messages
 type Message struct {
 	Id      uint64 `json:"id"`
 	Type    string `json:"type"`

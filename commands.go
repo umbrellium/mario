@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// The Task interface that Mario's commands must have
 type Task interface {
 	Hear(ws *websocket.Conn, message Message, input string) bool
 	Help(ws *websocket.Conn, message Message)
@@ -28,12 +29,14 @@ func init() {
 	tasks = append(tasks, Say{})
 }
 
-//**** HELLO TASK ****//
+// Hello Task
 // Returns a simple Hello string
 type Hello struct {
 	Name string "hello"
 }
 
+// Hear Hello
+// Returns true if the hello task is called
 func (h Hello) Hear(ws *websocket.Conn, message Message, input string) bool {
 	// parse input and check if 'hello' is the first word
 	r, err := regexp.Compile(`(?i)^\bhello\b`)
@@ -48,14 +51,15 @@ func (h Hello) Hear(ws *websocket.Conn, message Message, input string) bool {
 		if len(inputOptions) == 1 {
 			Hello.say(h, ws, message)
 			return true
-		} else {
-			if inputOptions[1] == "help" {
-				Hello.Help(h, ws, message)
-				return true
-			} else {
-				return false
-			}
 		}
+
+		if inputOptions[1] == "help" {
+			Hello.Help(h, ws, message)
+			return true
+		}
+
+		return false
+
 	} else {
 		return false
 	}
@@ -88,11 +92,13 @@ func (h Hello) say(ws *websocket.Conn, message Message) {
 	}
 }
 
-//**** HELP TASK ****//
+// Help Task
 // Returns help strings that explain how to use Mario's commands
 type Help struct {
 }
 
+// Hear Help
+// Returns true if the help task is called
 func (s Help) Hear(ws *websocket.Conn, message Message, input string) bool {
 	r, err := regexp.Compile(`(?i)^\bhelp\b`)
 
@@ -120,15 +126,15 @@ Did you mean "@mario help" ?`
 				log.Fatal(err)
 			}
 			return true
-		} else {
-			// too many args
-			return false
 		}
+		return false
 	} else {
 		return false
 	}
 }
 
+// Help Help
+// post a generic help message to Slack
 func (h Help) Help(ws *websocket.Conn, message Message) {
 
 	message.Text = `Use this command to get an explanation about how to ask me 
@@ -150,6 +156,8 @@ Here is a list of the tasks I can currently perform:
 	}
 }
 
+// getName Help
+// return struct name
 func (h Help) getName() string {
 	return "help"
 }
@@ -178,16 +186,20 @@ Type "@mario help" for a list of tasks I can perfom.`
 	}
 }
 
-//**** SAY TASK ****//
+// Say Task
 // returns a custom string that will be posted to Slack
 type Say struct {
 	Name string "say"
 }
 
+// Hear Say
+// Returns true if the say task is called
 func (s Say) Hear(ws *websocket.Conn, message Message, input string) bool {
 	return false
 }
 
+// Help Say
+// Returns a help string for the Say struct
 func (s Say) Help(ws *websocket.Conn, message Message) {
 	message.Text = `Use this command to tell Mario to send a message to Slack.
 	Usage: 
@@ -199,6 +211,8 @@ func (s Say) Help(ws *websocket.Conn, message Message) {
 	}
 }
 
+// getName Say
+// return struct name
 func (s Say) getName() string {
 	return "say"
 }
