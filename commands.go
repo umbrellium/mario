@@ -60,12 +60,13 @@ func (h Hello) Hear(ws *websocket.Conn, message Message, input string) bool {
 
 		return false
 
-	} else {
-		return false
 	}
+
+	return false
+
 }
 
-// Hello Help
+// Help Hello
 // Returns a help string for the Hello struct
 func (h Hello) Help(ws *websocket.Conn, message Message) {
 	message.Text = `The <hello> command simply prints a hello message to Slack.
@@ -128,14 +129,15 @@ Did you mean "@mario help" ?`
 			return true
 		}
 		return false
-	} else {
-		return false
 	}
+
+	return false
+
 }
 
 // Help Help
 // post a generic help message to Slack
-func (h Help) Help(ws *websocket.Conn, message Message) {
+func (s Help) Help(ws *websocket.Conn, message Message) {
 
 	message.Text = `Use this command to get an explanation about how to ask me 
 to  perform a task.
@@ -158,13 +160,13 @@ Here is a list of the tasks I can currently perform:
 
 // getName Help
 // return struct name
-func (h Help) getName() string {
+func (s Help) getName() string {
 	return "help"
 }
 
 // listCommands lists the tasks that Mario can perform.
 // Returns a message that will be posted to Slack
-func (h Help) listCommands(ws *websocket.Conn, message Message, command string) {
+func (s Help) listCommands(ws *websocket.Conn, message Message, command string) {
 	commanHelp := command + " help"
 	helpHandled := false
 

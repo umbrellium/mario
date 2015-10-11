@@ -16,7 +16,7 @@ box: wercker/golang
 # build pipeline
 build:
     steps:
-        - wercker/golint
+        #- wercker/golint
         - script:
             name: go build
             code: |
