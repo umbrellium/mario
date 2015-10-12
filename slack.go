@@ -10,6 +10,14 @@ import (
 	"sync/atomic"
 )
 
+type chatAgent interface {
+	getMessage(ws *websocket.Conn) (Message, error)
+	postMessage(ws *websocket.Conn, msg Message) error
+}
+
+type Slack struct {
+}
+
 type slackResponse struct {
 	Ok       bool   `json:"ok"`
 	Error    string `json:"error"`
@@ -71,7 +79,7 @@ func connectToSlack(token string) (*websocket.Conn, string, error) {
 
 // GetMessage listens to Slack messages
 // Returns the message or an error
-func getMessage(ws *websocket.Conn) (Message, error) {
+func (s *Slack) getMessage(ws *websocket.Conn) (Message, error) {
 
 	// the message to return
 	var msg Message
@@ -87,7 +95,8 @@ func getMessage(ws *websocket.Conn) (Message, error) {
 
 // PostMessage publishes a message on Slack
 // Returns an error if it couldn't complete the operation
-func postMessage(ws *websocket.Conn, msg Message) error {
+func (s *Slack) postMessage(ws *websocket.Conn, msg Message) error {
 	msg.Id = atomic.AddUint64(&counter, 1)
-	return websocket.JSON.Send(ws, msg)
+	err := websocket.JSON.Send(ws, msg)
+	return err
 }

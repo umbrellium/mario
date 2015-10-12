@@ -1,13 +1,15 @@
 package main
 
 import (
-	//"fmt"
 	"log"
 	"os"
 	"strings"
 )
 
 func main() {
+	// instantiate slack
+	var s Slack
+
 	// slack token must be set as environmet var or passed as command line
 	token := os.Getenv("TOKEN")
 	if token == "" {
@@ -18,28 +20,29 @@ func main() {
 	}
 
 	// connect to slack
-	websocket, marioId, err := connectToSlack(token)
+	websocket, marioID, err := connectToSlack(token)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for {
-		message, err := getMessage(websocket)
+		message, err := s.getMessage(websocket)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		// parse message and act accordingly
-		if message.Type == "message" && strings.HasPrefix(message.Text, "<@"+marioId+">") {
-			text := strings.TrimPrefix(message.Text, "<@"+marioId+"> ")
+		if message.Type == "message" && strings.HasPrefix(message.Text, "<@"+marioID+">") {
+			text := strings.TrimPrefix(message.Text, "<@"+marioID+"> ")
 			text = strings.TrimSpace(text)
 
 			messageHandled := false
 
 			for _, task := range tasks {
 				// we are using text to perform a reg ex and decide which method to call
-				if task.Hear(websocket, message, text) {
+				if task.Hear(&s, websocket, message, text) {
 					messageHandled = true
 					break
 				}
@@ -50,7 +53,7 @@ func main() {
 				message.Text = `I don't understand what you are asking me to do.
 Please ensure that your message doesn't contain any spelling mistake.
 You can type '@mario help' to see a list of the available tasks I can perform.`
-				err := postMessage(websocket, message)
+				err := s.postMessage(websocket, message)
 
 				if err != nil {
 					log.Fatal(err)
