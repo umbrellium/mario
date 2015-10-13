@@ -1,12 +1,10 @@
 package main
 
 import (
-	"github.com/umbrellium/mario/Godeps/_workspace/src/golang.org/x/net/websocket"
 	"testing"
 )
 
 var slack FakeSlackChat
-var ws websocket.Conn
 var msg = Message{1, "", "", ""}
 
 // FakeSlackChat is a fake slack requests struct
@@ -44,7 +42,7 @@ func TestHelloHearCommand(t *testing.T) {
 	}
 
 	for _, tst := range helloHearTest {
-		res := hello.Hear(&slack, &ws, msg, tst.input)
+		res := hello.Hear(&slack, msg, tst.input)
 		if res != tst.expected {
 			t.Errorf("Expected %q to return %q, got %q instead", tst.input, tst.expected, res)
 		}
@@ -69,7 +67,7 @@ func TestHelloHearHelp(t *testing.T) {
 	}
 
 	for _, tst := range helloHearHelp {
-		res := hello.Hear(&slack, &ws, msg, tst.input)
+		res := hello.Hear(&slack, msg, tst.input)
 		if res != tst.expected {
 			t.Errorf("Expected %q to return %q, got %q instead", tst.input, tst.expected, res)
 		}
@@ -79,7 +77,7 @@ func TestHelloHearHelp(t *testing.T) {
 func TestHelloSay(t *testing.T) {
 	hello := new(Hello)
 
-	err := hello.say(&slack, &ws, msg)
+	err := hello.say(&slack, msg)
 
 	if err != nil {
 		t.Errorf("Expected Hello.say to return no error")

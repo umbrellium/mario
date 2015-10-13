@@ -6,7 +6,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/umbrellium/mario/Godeps/_workspace/src/golang.org/x/net/websocket"
 	"log"
 	"regexp"
 	"strings"
@@ -14,8 +13,8 @@ import (
 
 // The Task interface that Mario's commands must have
 type Task interface {
-	Hear(slack chatAgent, ws *websocket.Conn, message Message, input string) bool
-	Help(slack chatAgent, ws *websocket.Conn, message Message) error
+	Hear(slack chatAgent, message Message, input string) bool
+	Help(slack chatAgent, message Message) error
 	getName() string
 }
 
@@ -38,7 +37,7 @@ type Hello struct {
 
 // Hello Hear
 // Returns true if the hello task is called
-func (h Hello) Hear(slack chatAgent, ws *websocket.Conn, message Message, input string) bool {
+func (h Hello) Hear(slack chatAgent, message Message, input string) bool {
 	// parse input and check if 'hello' is the first word
 	r, err := regexp.Compile(`(?i)^\bhello\b`)
 	if err != nil {
@@ -50,12 +49,12 @@ func (h Hello) Hear(slack chatAgent, ws *websocket.Conn, message Message, input 
 		inputOptions := strings.Fields(input)
 
 		if len(inputOptions) == 1 {
-			Hello.say(h, slack, ws, message)
+			Hello.say(h, slack, message)
 			return true
 		}
 
 		if len(inputOptions) == 2 && inputOptions[1] == "help" {
-			err := Hello.Help(h, slack, ws, message)
+			err := Hello.Help(h, slack, message)
 
 			if err != nil {
 				fmt.Println("Error posting message to slack")
@@ -70,7 +69,7 @@ func (h Hello) Hear(slack chatAgent, ws *websocket.Conn, message Message, input 
 
 // Hello Help
 // Returns a help string for the Hello struct
-func (s Hello) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
+func (s Hello) Help(slack chatAgent, message Message) error {
 	message.Text = `The <hello> command simply prints a hello message to Slack.
 This command doesn't take any other options`
 	err := slack.postMessage(message)
@@ -88,7 +87,7 @@ func (s Hello) getName() string {
 
 // Hello Say
 // Posts a "Hello!" message to Slack
-func (s Hello) say(slack chatAgent, ws *websocket.Conn, message Message) error {
+func (s Hello) say(slack chatAgent, message Message) error {
 	message.Text = "Hello There!"
 	err := slack.postMessage(message)
 
@@ -107,7 +106,7 @@ type Help struct {
 
 // Help Hear
 // Returns true if the help task is called
-func (s Help) Hear(slack chatAgent, ws *websocket.Conn, message Message, input string) bool {
+func (s Help) Hear(slack chatAgent, message Message, input string) bool {
 	r, err := regexp.Compile(`(?i)^\bhelp\b`)
 
 	if err != nil {
@@ -119,7 +118,7 @@ func (s Help) Hear(slack chatAgent, ws *websocket.Conn, message Message, input s
 
 		if len(options) == 1 {
 			// generice help
-			err := s.Help(slack, ws, message)
+			err := s.Help(slack, message)
 
 			if err != nil {
 				fmt.Println("Error posting message to slack")
@@ -130,7 +129,7 @@ func (s Help) Hear(slack chatAgent, ws *websocket.Conn, message Message, input s
 
 		} else if len(options) == 2 && options[1] != "help" {
 			// specific task help
-			s.listCommands(slack, ws, message, options[1])
+			s.listCommands(slack, message, options[1])
 			return true
 
 		} else if len(options) == 2 && options[1] == "help" {
@@ -150,7 +149,7 @@ Did you mean "@mario help" ?`
 
 // Help Help
 // post a generic help message to Slack
-func (s Help) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
+func (s Help) Help(slack chatAgent, message Message) error {
 
 	message.Text = `Use this command to get an explanation about how to ask me 
 to  perform a task.
@@ -182,12 +181,12 @@ func (s Help) getName() string {
 
 // listCommands lists the tasks that Mario can perform.
 // Returns a message that will be posted to Slack
-func (s Help) listCommands(slack chatAgent, ws *websocket.Conn, message Message, command string) {
+func (s Help) listCommands(slack chatAgent, message Message, command string) {
 	commanHelp := command + " help"
 	helpHandled := false
 
 	for _, task := range tasks {
-		if task.Hear(slack, ws, message, commanHelp) {
+		if task.Hear(slack, message, commanHelp) {
 			helpHandled = true
 			break
 		}
@@ -212,13 +211,13 @@ type Say struct {
 
 // Hear Say
 // Returns true if the say task is called
-func (s Say) Hear(slack chatAgent, ws *websocket.Conn, message Message, input string) bool {
+func (s Say) Hear(slack chatAgent, message Message, input string) bool {
 	return false
 }
 
 // Help Say
 // Returns a help string for the Say struct
-func (s Say) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
+func (s Say) Help(slack chatAgent, message Message) error {
 	message.Text = `Use this command to tell Mario to send a message to Slack.
 	Usage: 
 	- @mario say "the message to post to Slack"`

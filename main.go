@@ -52,7 +52,7 @@ func main() {
 
 			for _, task := range tasks {
 				// we are using text to perform a reg ex and decide which method to call
-				if task.Hear(&s, s.Socket, message, text) {
+				if task.Hear(&s, message, text) {
 					messageHandled = true
 					break
 				}
