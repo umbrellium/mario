@@ -1,18 +1,5 @@
 box: wercker/golang
 
-# dev pipeline
-##########
-# activate when app is live
-# works only with new stack
-##########
-# dev:
-# 	steps:
-# 		-internal/watch:
-# 			code: |
-# 				go build ./
-# 				./source
-# 			reload: true
-
 # build pipeline
 build:
     steps:
@@ -44,7 +31,7 @@ deploy:
             key-name: HEROKU_DEPLOY
 
         # Fire the app
-        - script:
-            name: start mario
-            code: |
-                mario
+        # - script:
+        #     name: start mario
+        #     code: |
+        #         mario
