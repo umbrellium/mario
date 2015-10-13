@@ -1,0 +1,10 @@
+{
+	"ImportPath": "github.com/umbrellium/mario",
+	"GoVersion": "go1.5.1",
+	"Deps": [
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Rev": "47990a1ba55743e6ef1affd3a14e5bac8553615d"
+		}
+	]
+}

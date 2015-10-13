@@ -6,7 +6,7 @@ package main
 
 import (
 	"fmt"
-	"golang.org/x/net/websocket"
+	"github.com/umbrellium/mario/Godeps/_workspace/src/golang.org/x/net/websocket"
 	"log"
 	"regexp"
 	"strings"
