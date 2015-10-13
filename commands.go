@@ -15,7 +15,7 @@ import (
 // The Task interface that Mario's commands must have
 type Task interface {
 	Hear(slack chatAgent, ws *websocket.Conn, message Message, input string) bool
-	Help(slack chatAgent, ws *websocket.Conn, message Message)
+	Help(slack chatAgent, ws *websocket.Conn, message Message) error
 	getName() string
 }
 
@@ -36,7 +36,7 @@ type Hello struct {
 	Name string "hello"
 }
 
-// Hear Hello
+// Hello Hear
 // Returns true if the hello task is called
 func (h Hello) Hear(slack chatAgent, ws *websocket.Conn, message Message, input string) bool {
 	// parse input and check if 'hello' is the first word
@@ -54,8 +54,13 @@ func (h Hello) Hear(slack chatAgent, ws *websocket.Conn, message Message, input 
 			return true
 		}
 
-		if len(inputOptions) > 1 && inputOptions[1] == "help" {
-			Hello.Help(h, slack, ws, message)
+		if len(inputOptions) == 2 && inputOptions[1] == "help" {
+			err := Hello.Help(h, slack, ws, message)
+
+			if err != nil {
+				fmt.Println("Error posting message to slack")
+				return false
+			}
 			return true
 		}
 		return false
@@ -63,16 +68,18 @@ func (h Hello) Hear(slack chatAgent, ws *websocket.Conn, message Message, input 
 	return false
 }
 
-// Help Hello
+// Hello Help
 // Returns a help string for the Hello struct
-func (s Hello) Help(slack chatAgent, ws *websocket.Conn, message Message) {
+func (s Hello) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
 	message.Text = `The <hello> command simply prints a hello message to Slack.
 This command doesn't take any other options`
 	err := slack.postMessage(ws, message)
 
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 func (s Hello) getName() string {
@@ -81,13 +88,16 @@ func (s Hello) getName() string {
 
 // Hello Say
 // Posts a "Hello!" message to Slack
-func (s Hello) say(slack chatAgent, ws *websocket.Conn, message Message) {
+func (s Hello) say(slack chatAgent, ws *websocket.Conn, message Message) error {
 	message.Text = "Hello There!"
 	err := slack.postMessage(ws, message)
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return err
 	}
+
+	return nil
 }
 
 // Help Task
@@ -95,7 +105,7 @@ func (s Hello) say(slack chatAgent, ws *websocket.Conn, message Message) {
 type Help struct {
 }
 
-// Hear Help
+// Help Hear
 // Returns true if the help task is called
 func (s Help) Hear(slack chatAgent, ws *websocket.Conn, message Message, input string) bool {
 	r, err := regexp.Compile(`(?i)^\bhelp\b`)
@@ -109,12 +119,20 @@ func (s Help) Hear(slack chatAgent, ws *websocket.Conn, message Message, input s
 
 		if len(options) == 1 {
 			// generice help
-			s.Help(slack, ws, message)
+			err := s.Help(slack, ws, message)
+
+			if err != nil {
+				fmt.Println("Error posting message to slack")
+				return false
+			}
+
 			return true
+
 		} else if len(options) == 2 && options[1] != "help" {
 			// specific task help
 			s.listCommands(slack, ws, message, options[1])
 			return true
+
 		} else if len(options) == 2 && options[1] == "help" {
 			// excetion: user typed "help" twice
 			message.Text = `The <help> command doesn't take any argument.
@@ -127,14 +145,12 @@ Did you mean "@mario help" ?`
 		}
 		return false
 	}
-
 	return false
-
 }
 
 // Help Help
 // post a generic help message to Slack
-func (s Help) Help(slack chatAgent, ws *websocket.Conn, message Message) {
+func (s Help) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
 
 	message.Text = `Use this command to get an explanation about how to ask me 
 to  perform a task.
@@ -152,7 +168,10 @@ Here is a list of the tasks I can currently perform:
 
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
 
 // getName Help
@@ -199,15 +218,18 @@ func (s Say) Hear(slack chatAgent, ws *websocket.Conn, message Message, input st
 
 // Help Say
 // Returns a help string for the Say struct
-func (s Say) Help(slack chatAgent, ws *websocket.Conn, message Message) {
+func (s Say) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
 	message.Text = `Use this command to tell Mario to send a message to Slack.
 	Usage: 
 	- @mario say "the message to post to Slack"`
 	err := slack.postMessage(ws, message)
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return err
 	}
+
+	return nil
 }
 
 // getName Say
