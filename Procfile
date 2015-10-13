@@ -1,1 +1,1 @@
-worker: mario
+web: mario
