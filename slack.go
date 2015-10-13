@@ -13,9 +13,12 @@ import (
 type chatAgent interface {
 	getMessage(ws *websocket.Conn) (Message, error)
 	postMessage(ws *websocket.Conn, msg Message) error
+	//GetMessage() (Message, error)
+	//PostMessage(msg Message) error
 }
 
 type Slack struct {
+	//*websocket.Conn
 }
 
 type slackResponse struct {
