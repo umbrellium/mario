@@ -41,7 +41,7 @@ build:
 deploy:
     steps:
         - heroku-deploy:
-            key-name: HEROKU_DEPLOYls
+            key-name: HEROKU_DEPLOY
 
         # Fire the app
         - script:
