@@ -30,7 +30,7 @@ deploy:
         - heroku-deploy:
             key-name: HEROKU_DEPLOY
 
-        Fire the app
+        #Fire the app
         - script:
             name: start mario
             code: |
