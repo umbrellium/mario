@@ -26,14 +26,14 @@ func main() {
 	}
 
 	// connect to slack
-	websocket, marioID, err := connectToSlack(token)
+	s.Socket, marioID, err := connectToSlack(token)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for {
-		message, err := s.getMessage(websocket)
+		message, err := s.getMessage()
 
 		if err != nil {
 			log.Fatal(err)
