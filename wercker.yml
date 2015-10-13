@@ -36,3 +36,9 @@ build:
             name: go test
             code: |
                 go test ./
+
+# deploy to heroku pipeline
+deploy:
+  steps:
+    - heroku-deploy:
+      key-name: HEROKU_DEPLOY
