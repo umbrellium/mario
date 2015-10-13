@@ -34,4 +34,4 @@ deploy:
         - script:
             name: start mario
             code: |
-                ./mario
+                pwd
