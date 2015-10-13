@@ -11,14 +11,12 @@ import (
 )
 
 type chatAgent interface {
-	getMessage(ws *websocket.Conn) (Message, error)
-	postMessage(ws *websocket.Conn, msg Message) error
-	//GetMessage() (Message, error)
-	//PostMessage(msg Message) error
+	getMessage() (Message, error)
+	postMessage(msg Message) error
 }
 
 type Slack struct {
-	//*websocket.Conn
+	Socket *websocket.Conn
 }
 
 type slackResponse struct {
@@ -82,11 +80,11 @@ func connectToSlack(token string) (*websocket.Conn, string, error) {
 
 // GetMessage listens to Slack messages
 // Returns the message or an error
-func (s *Slack) getMessage(ws *websocket.Conn) (Message, error) {
+func (s *Slack) getMessage() (Message, error) {
 
 	// the message to return
 	var msg Message
-	err := websocket.JSON.Receive(ws, &msg)
+	err := websocket.JSON.Receive(s.Socket, &msg)
 
 	if err != nil {
 		fmt.Errorf("Error: cannot get message")
@@ -98,8 +96,8 @@ func (s *Slack) getMessage(ws *websocket.Conn) (Message, error) {
 
 // PostMessage publishes a message on Slack
 // Returns an error if it couldn't complete the operation
-func (s *Slack) postMessage(ws *websocket.Conn, msg Message) error {
+func (s *Slack) postMessage(msg Message) error {
 	msg.Id = atomic.AddUint64(&counter, 1)
-	err := websocket.JSON.Send(ws, msg)
+	err := websocket.JSON.Send(s.Socket, msg)
 	return err
 }
