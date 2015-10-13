@@ -1,1 +1,1 @@
-worker: app/bin/mario
+worker: mario
