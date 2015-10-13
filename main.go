@@ -13,12 +13,13 @@ func main() {
 
 	// slack token must be set as environmet var or passed as command line
 	token := os.Getenv("TOKEN")
-	if token == "" {
-		token = os.Args[1]
-		if token == "" {
-			log.Fatal("You must pass a token to connect to Slack")
-		}
-	}
+	log.Println(token)
+	// if token == "" {
+	// 	token = os.Args[1]
+	// 	if token == "" {
+	// 		log.Fatal("You must pass a token to connect to Slack")
+	// 	}
+	// }
 
 	// connect to slack
 	websocket, marioID, err := connectToSlack(token)
