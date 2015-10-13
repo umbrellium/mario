@@ -39,6 +39,6 @@ build:
 
 # deploy to heroku pipeline
 deploy:
-  steps:
-    - heroku-deploy:
-      key-name: HEROKU_DEPLOY
+    steps:
+      - heroku-deploy:
+          key-name: HEROKU_DEPLOY
