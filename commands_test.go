@@ -59,6 +59,14 @@ func TestHelloHearHelp(t *testing.T) {
 		expected bool
 	}
 
+	//var testcases = []struct{
+	//	input string
+	//	expected bool
+	//}{
+	//	{"hello help", true},
+
+	//}
+
 	helloHearHelp := []helloTestingStruct{
 		{"hello help", true},
 		{"hello help help", false},
