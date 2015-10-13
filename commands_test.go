@@ -23,9 +23,24 @@ func TestHelloCommand(t *testing.T) {
 	msg := Message{1, "", "", ""}
 	hello := new(Hello)
 
-	test1 := hello.Hear(slack, ws, msg, "hello")
+	type helloTestingStruct struct {
+		input    string
+		expected bool
+	}
 
-	if test1 != true {
-		t.Fatalf("Expected to hear 'hello', returned %q", test1)
+	helloTest := []helloTestingStruct{
+		{"hello", true},
+		{"hello ", true},
+		{"Hello", true},
+		{"", false},
+		{"helloh", false},
+		{"hello hello", false},
+	}
+
+	for _, tst := range helloTest {
+		res := hello.Hear(slack, ws, msg, tst.input)
+		if res != tst.expected {
+			t.Errorf("Expected %q to return %q, got instead %q", tst.input, tst.expected, res)
+		}
 	}
 }
