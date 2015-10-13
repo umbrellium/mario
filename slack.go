@@ -44,7 +44,7 @@ var counter uint64
 
 // ConnectToSlack starts Slack real time messaging and opens a websocket
 // Returns a websocket, a userID, an error
-func connectToSlack(token string) (websocket.Conn, string, error) {
+func connectToSlack(token string) (*websocket.Conn, string, error) {
 	url := "https://slack.com/api/rtm.start?token=" + token
 
 	// connect to rtm
@@ -86,7 +86,7 @@ func (s *Slack) getMessage() (Message, error) {
 
 	// the message to return
 	var msg Message
-	err := websocket.JSON.Receive(s.socket, &msg)
+	err := websocket.JSON.Receive(s.Socket, &msg)
 
 	if err != nil {
 		fmt.Errorf("Error: cannot get message")
@@ -100,6 +100,6 @@ func (s *Slack) getMessage() (Message, error) {
 // Returns an error if it couldn't complete the operation
 func (s *Slack) postMessage(msg Message) error {
 	msg.Id = atomic.AddUint64(&counter, 1)
-	err := websocket.JSON.Send(s.socket, msg)
+	err := websocket.JSON.Send(s.Socket, msg)
 	return err
 }

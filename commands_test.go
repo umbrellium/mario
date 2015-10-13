@@ -15,13 +15,13 @@ var msg = Message{1, "", "", ""}
 type FakeSlackChat struct{}
 
 // fakeSlackChat implement get message
-func (t *FakeSlackChat) getMessage(ws *websocket.Conn) (Message, error) {
+func (t *FakeSlackChat) getMessage() (Message, error) {
 	msg := new(Message)
 	return *msg, nil
 }
 
 // fakeSlackChat implement post message
-func (t *FakeSlackChat) postMessage(ws *websocket.Conn, msg Message) error {
+func (t *FakeSlackChat) postMessage(msg Message) error {
 	return nil
 }
 
@@ -58,14 +58,6 @@ func TestHelloHearHelp(t *testing.T) {
 		input    string
 		expected bool
 	}
-
-	//var testcases = []struct{
-	//	input string
-	//	expected bool
-	//}{
-	//	{"hello help", true},
-
-	//}
 
 	helloHearHelp := []helloTestingStruct{
 		{"hello help", true},

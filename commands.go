@@ -73,7 +73,7 @@ func (h Hello) Hear(slack chatAgent, ws *websocket.Conn, message Message, input 
 func (s Hello) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
 	message.Text = `The <hello> command simply prints a hello message to Slack.
 This command doesn't take any other options`
-	err := slack.postMessage(ws, message)
+	err := slack.postMessage(message)
 
 	if err != nil {
 		log.Fatal(err)
@@ -90,7 +90,7 @@ func (s Hello) getName() string {
 // Posts a "Hello!" message to Slack
 func (s Hello) say(slack chatAgent, ws *websocket.Conn, message Message) error {
 	message.Text = "Hello There!"
-	err := slack.postMessage(ws, message)
+	err := slack.postMessage(message)
 
 	if err != nil {
 		fmt.Println(err)
@@ -137,7 +137,7 @@ func (s Help) Hear(slack chatAgent, ws *websocket.Conn, message Message, input s
 			// excetion: user typed "help" twice
 			message.Text = `The <help> command doesn't take any argument.
 Did you mean "@mario help" ?`
-			err := slack.postMessage(ws, message)
+			err := slack.postMessage(message)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -164,7 +164,7 @@ Here is a list of the tasks I can currently perform:
 		message.Text += "- " + t.getName() + fmt.Sprintf("\n")
 	}
 
-	err := slack.postMessage(ws, message)
+	err := slack.postMessage(message)
 
 	if err != nil {
 		log.Fatal(err)
@@ -196,7 +196,7 @@ func (s Help) listCommands(slack chatAgent, ws *websocket.Conn, message Message,
 	if helpHandled == false {
 		message.Text = `I don't understand what you need help with.
 Type "@mario help" for a list of tasks I can perfom.`
-		err := slack.postMessage(ws, message)
+		err := slack.postMessage(message)
 
 		if err != nil {
 			log.Fatal(err)
@@ -222,7 +222,7 @@ func (s Say) Help(slack chatAgent, ws *websocket.Conn, message Message) error {
 	message.Text = `Use this command to tell Mario to send a message to Slack.
 	Usage: 
 	- @mario say "the message to post to Slack"`
-	err := slack.postMessage(ws, message)
+	err := slack.postMessage(message)
 
 	if err != nil {
 		fmt.Println(err)
