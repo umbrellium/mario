@@ -1,1 +1,1 @@
-worker: mario
+worker: ./mario
