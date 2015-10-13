@@ -13,7 +13,7 @@ func main() {
 	// instantiate slack
 	var s Slack
 
-	fmt.Println("Running Mario")
+	fmt.Println("Running Mario. Press ctrl+C to stop")
 
 	// slack token must be set as environmet var or passed as command line
 	token := os.Getenv("TOKEN")
