@@ -1,1 +1,1 @@
-worker: ./mario
+worker: sh bin/mario
