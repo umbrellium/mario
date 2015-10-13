@@ -1,2 +1,5 @@
 #heroku procfile
 .Procfile
+
+# Heroku local specific environment file.
+.env
