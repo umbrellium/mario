@@ -20,10 +20,10 @@ build:
         - setup-go-workspace
 
         # Gets dependencies
-        - script:
-            name: go get
-            code: |
-                go get ./
+        # - script:
+        #     name: go get
+        #     code: |
+        #         go get ./
 
         # Build the projetc
         - script:
