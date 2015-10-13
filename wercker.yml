@@ -40,5 +40,11 @@ build:
 # deploy to heroku pipeline
 deploy:
     steps:
-      - heroku-deploy:
-          key-name: HEROKU_DEPLOY
+        - heroku-deploy:
+            key-name: HEROKU_DEPLOY
+
+        # Fire the app
+        - script:
+            name: start mario
+            code: |
+                bin/mario
