@@ -1,1 +1,1 @@
-web: mario
+web: ./bin/mario
