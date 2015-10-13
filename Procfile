@@ -1,1 +1,1 @@
-web: mario
+worker: bin/mario
