@@ -1,1 +1,1 @@
-worker: ./bin/mario
+worker: mario
