@@ -13,7 +13,7 @@ func main() {
 	// instantiate slack
 	var s Slack
 
-	fmt.Println("Running Mario. Press ctrl+C to stop")
+	fmt.Println("Running Mario. Press ctrl+C to stop it")
 
 	// slack token must be set as environmet var or passed as command line
 	token := os.Getenv("TOKEN")
@@ -69,8 +69,6 @@ You can type '@mario help' to see a list of the available tasks I can perform.`
 					log.Fatal(err)
 				}
 			}
-
 		}
-
 	}
 }
