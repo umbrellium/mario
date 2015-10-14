@@ -298,6 +298,37 @@ func (s Wercker) Hear(slack chatAgent, message Message, input string) bool {
 	return false
 }
 
+func connectToWerckerAPI(endpoint string) (*http.Response, error) {
+	wtoken := os.Getenv("WERCKER_TOKEN")
+	if wtoken == "" {
+		wtoken = os.Args[2]
+		// NOTE: token can be an empty string
+		// Wercker will retrun only public apps
+	}
+
+	var url string
+
+	switch endpoint {
+	case "applications":
+		url = "https://app.wercker.com/api/v3/applications/umbrellium?token=" + wtoken
+	case "builds":
+		url = "https://app.wercker.com/api/v3/builds/"
+	case "deploy":
+		url = "https://app.wercker.com/api/v3/deploys/"
+	}
+
+	res, err := http.Get(url)
+
+	if err != nil {
+		fmt.Println("Error: problem talking to Wercker API")
+		return nil, err
+	}
+
+	return res, nil
+}
+
+// Wercker listApps
+// prints a list of Umbrellium apps that are currently available on Wercker
 func (s Wercker) listApps(slack chatAgent, message Message) error {
 
 	wtoken := os.Getenv("WERCKER_TOKEN")
@@ -310,7 +341,6 @@ func (s Wercker) listApps(slack chatAgent, message Message) error {
 	// get request to wercker api
 	url := "https://app.wercker.com/api/v3/applications/umbrellium?token=" + wtoken
 	var availbaleApps []werkerApps
-	// client := &http.Client{}
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -321,7 +351,7 @@ func (s Wercker) listApps(slack chatAgent, message Message) error {
 	// parse response
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("Error: problem talking to Wercker API")
+		fmt.Println("Error: problem reading response from Wercker API")
 		return err
 	}
 
