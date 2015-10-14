@@ -5,8 +5,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -27,6 +31,7 @@ func init() {
 	tasks = append(tasks, Help{})
 	tasks = append(tasks, Hello{})
 	tasks = append(tasks, Say{})
+	tasks = append(tasks, Wercker{})
 }
 
 // Hello Task
@@ -206,12 +211,31 @@ Type "@mario help" for a list of tasks I can perfom.`
 // Say Task
 // returns a custom string that will be posted to Slack
 type Say struct {
-	Name string "say"
 }
 
 // Hear Say
 // Returns true if the say task is called
 func (s Say) Hear(slack chatAgent, message Message, input string) bool {
+	r, err := regexp.Compile(`(?i)^\bsay\b`)
+
+	if err != nil {
+		fmt.Println("Error parsing Help input")
+	}
+
+	if r.MatchString(input) {
+
+		options := strings.Fields(input)
+
+		if len(options) == 1 || options[1] == "help" {
+			err := Say.Help(s, slack, message)
+
+			if err != nil {
+				fmt.Println("Error parsing Hear option")
+				return false
+			}
+			return true
+		}
+	}
 	return false
 }
 
@@ -235,4 +259,106 @@ func (s Say) Help(slack chatAgent, message Message) error {
 // return struct name
 func (s Say) getName() string {
 	return "say"
+}
+
+// Wercker struct
+// performs Wercker realted tasks (e.g. list apps, deploy app etc)
+type Wercker struct {
+}
+
+type werkerApps struct {
+	Name string `json:name`
+}
+
+func (s Wercker) Hear(slack chatAgent, message Message, input string) bool {
+	patter, err := regexp.Compile(`^\blist apps\b`)
+
+	if err != nil {
+		fmt.Println("Error parsing Help input")
+	}
+
+	if patter.MatchString(input) {
+		options := strings.Fields(input)
+
+		if len(options) == 2 {
+			Wercker.listApps(s, slack, message)
+			return true
+		}
+
+		if options[2] == "help" {
+			// call help
+			err := Wercker.Help(s, slack, message)
+			if err != nil {
+				fmt.Println("Error calling Wercker Help")
+				return false
+			}
+			return true
+		}
+	}
+	return false
+}
+
+func (s Wercker) listApps(slack chatAgent, message Message) error {
+
+	wtoken := os.Getenv("WERCKER_TOKEN")
+	if wtoken == "" {
+		wtoken = os.Args[2]
+		// NOTE: token can be an empty string
+		// Wercker will retrun only public apps
+	}
+
+	// get request to wercker api
+	url := "https://app.wercker.com/api/v3/applications/umbrellium?token=" + token
+	var availbaleApps []werkerApps
+	// client := &http.Client{}
+
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error: problem talking to Wercker API")
+		return err
+	}
+
+	// parse response
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error: problem talking to Wercker API")
+		return err
+	}
+
+	json.Unmarshal(body, &availbaleApps)
+
+	message.Text = "The following apps are currently available on Wercker: \n"
+
+	// print response to slack
+	for _, app := range availbaleApps {
+		fmt.Println(app)
+		message.Text += app.Name + fmt.Sprintf("\n")
+	}
+
+	err2 := slack.postMessage(message)
+	if err2 != nil {
+		fmt.Println("Error: problem posting message to Slack")
+		return err2
+	}
+
+	return nil
+}
+
+func (s Wercker) Help(slack chatAgent, message Message) error {
+	message.Text = `<list apps> will list the Umbrellium applications currently available on Wercker. 
+This command does not take any option. 
+`
+
+	err := slack.postMessage(message)
+
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	return nil
+}
+
+func (s Wercker) getName() string {
+	return "list apps"
 }
