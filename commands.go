@@ -308,7 +308,7 @@ func (s Wercker) listApps(slack chatAgent, message Message) error {
 	}
 
 	// get request to wercker api
-	url := "https://app.wercker.com/api/v3/applications/umbrellium?token=" + token
+	url := "https://app.wercker.com/api/v3/applications/umbrellium?token=" + wtoken
 	var availbaleApps []werkerApps
 	// client := &http.Client{}
 
