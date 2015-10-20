@@ -1,1 +1,2 @@
-worker: marioheroku ps:scale worker=1
+worker: mario
+heroku ps:scale worker=1

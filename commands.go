@@ -281,7 +281,13 @@ func (s Wercker) Hear(slack chatAgent, message Message, input string) bool {
 		options := strings.Fields(input)
 
 		if len(options) == 2 {
-			Wercker.listApps(s, slack, message)
+			res, err := Wercker.connectToAPI(s, "applications")
+			if err != nil {
+				fmt.Println("Error connecting to the Wercker API")
+				return false
+			}
+
+			Wercker.listApps(s, res, slack, message)
 			return true
 		}
 
@@ -298,8 +304,7 @@ func (s Wercker) Hear(slack chatAgent, message Message, input string) bool {
 	return false
 }
 
-func (s Wercker) listApps(slack chatAgent, message Message) error {
-
+func (s Wercker) connectToAPI(endpoint string) (*http.Response, error) {
 	wtoken := os.Getenv("WERCKER_TOKEN")
 	if wtoken == "" {
 		wtoken = os.Args[2]
@@ -307,21 +312,37 @@ func (s Wercker) listApps(slack chatAgent, message Message) error {
 		// Wercker will retrun only public apps
 	}
 
-	// get request to wercker api
-	url := "https://app.wercker.com/api/v3/applications/umbrellium?token=" + wtoken
-	var availbaleApps []werkerApps
-	// client := &http.Client{}
+	var url string
 
-	res, err := http.Get(url)
-	if err != nil {
-		fmt.Println("Error: problem talking to Wercker API")
-		return err
+	switch endpoint {
+	case "applications":
+		url = "https://app.wercker.com/api/v3/applications/umbrellium?token=" + wtoken
+	case "builds":
+		url = "https://app.wercker.com/api/v3/builds/"
+	case "deploy":
+		url = "https://app.wercker.com/api/v3/deploys/"
 	}
 
-	// parse response
-	body, err := ioutil.ReadAll(res.Body)
+	res, err := http.Get(url)
+
 	if err != nil {
 		fmt.Println("Error: problem talking to Wercker API")
+		return nil, err
+	}
+
+	return res, nil
+}
+
+// Wercker listApps
+// prints a list of Umbrellium apps that are currently available on Wercker
+func (s Wercker) listApps(httpRes *http.Response, slack chatAgent, message Message) error {
+
+	var availbaleApps []werkerApps
+
+	// parse response
+	body, err := ioutil.ReadAll(httpRes.Body)
+	if err != nil {
+		fmt.Println("Error: problem reading response from Wercker API")
 		return err
 	}
 

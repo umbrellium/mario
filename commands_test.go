@@ -49,6 +49,7 @@ func TestHelloHearCommand(t *testing.T) {
 	}
 }
 
+// test <hear hello> command
 func TestHelloHearHelp(t *testing.T) {
 	hello := new(Hello)
 
@@ -82,4 +83,9 @@ func TestHelloSay(t *testing.T) {
 	if err != nil {
 		t.Errorf("Expected Hello.say to return no error")
 	}
+}
+
+// test parse wercker list app
+func TestWerckerListApps(t *testing.T) {
+	// 	wercker := new(Wercker)
 }
