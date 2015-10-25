@@ -75,6 +75,7 @@ func TestHelloHearHelp(t *testing.T) {
 	}
 }
 
+// test <hello> command
 func TestHelloSay(t *testing.T) {
 	hello := new(Hello)
 
