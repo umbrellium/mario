@@ -1,6 +1,6 @@
 box: wercker/golang
 
-# build pipeline
+# build
 build:
     steps:
         #- wercker/golint
@@ -18,7 +18,7 @@ build:
             code: |
                 go test ./
 
-# deploy to heroku pipeline
+# deploy to heroku
 deploy:
     steps:
         - heroku-deploy:
