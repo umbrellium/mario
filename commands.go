@@ -93,7 +93,7 @@ func (s Hello) getName() string {
 // Hello Say
 // Posts a "Hello!" message to Slack
 func (s Hello) say(slack chatAgent, message Message) error {
-	message.Text = "Yo"
+	message.Text = "Yo!"
 	err := slack.postMessage(message)
 
 	if err != nil {
