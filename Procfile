@@ -1,2 +1,2 @@
-web: mario
-heroku ps:scale web=1
+worker: mario
+heroku ps:scale worker=1
