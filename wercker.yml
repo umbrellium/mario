@@ -6,12 +6,6 @@ build:
         #- wercker/golint
         - setup-go-workspace
 
-        # Gets dependencies
-        # - script:
-        #     name: go get
-        #     code: |
-        #         go get ./
-
         # Build the projetc
         - script:
             name: go build

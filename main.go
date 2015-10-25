@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/umbrellium/mario/Godeps/_workspace/src/golang.org/x/net/websocket"
+	"golang.org/x/net/websocket"
 	"log"
 	"os"
 	"strings"
